@@ -1,127 +1,570 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بوابة الطلاب والمبرمجين</title>
-  <style>
-    /* ===== Reset & Base ===== */
-    * {margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
-    body {background:#f4f4f4;color:#333;transition:background 0.3s, color 0.3s;}
-    a {text-decoration:none;color:#007BFF;}
-    h1,h2 {margin-bottom:0.5em;}
-    /* ===== Header ===== */
-    header {padding:20px;text-align:center;background:#007BFF;color:#fff;}
-    header h1 {margin-bottom:10px;}
-    header button {padding:10px 20px;margin-top:10px;border:none;border-radius:5px;background:#fff;color:#007BFF;cursor:pointer;}
-    /* ===== Search & Filter ===== */
-    .controls {padding:20px;text-align:center;}
-    .controls input {padding:10px;width:60%;max-width:400px;border-radius:5px;border:1px solid #ccc;margin-bottom:10px;}
-    .filter-btns button {padding:8px 15px;margin:5px;border:none;border-radius:5px;background:#007BFF;color:#fff;cursor:pointer;}
-    .filter-btns button.active {background:#0056b3;}
-    /* ===== Cards ===== */
-    .cards {display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;padding:20px;}
-    .card {background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
-    .card h3 {margin-bottom:10px;}
-    .card p {margin-bottom:10px;}
-    .card a {display:inline-block;padding:5px 10px;background:#007BFF;color:#fff;border-radius:4px;}
-    /* ===== Footer ===== */
-    footer {padding:20px;text-align:center;background:#333;color:#fff;margin-top:20px;}
-    /* ===== Dark Mode ===== */
-    body.dark {background:#121212;color:#ddd;}
-    body.dark header {background:#1a73e8;color:#fff;}
-    body.dark .card {background:#1e1e1e;color:#ddd;box-shadow:0 2px 5px rgba(255,255,255,0.1);}
-    body.dark .filter-btns button, body.dark header button {background:#1a73e8;color:#fff;}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 Offline Document AI</title>
+    <link rel="manifest" href="#" id="manifest">
+    <meta name="theme-color" content="#2196F3">
+    <meta name="mobile-web-app-capable" content="yes">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .upload-zone {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-zone:hover {
+            border-color: #2196F3;
+            background: #f8f9ff;
+        }
+
+        .upload-zone.dragover {
+            border-color: #4CAF50;
+            background: #f0fff0;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .document-info {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2196F3;
+        }
+
+        .chat-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+
+        .message {
+            margin: 15px 0;
+        }
+
+        .user-message {
+            background: #2196F3;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 18px 18px 5px 18px;
+            margin-left: 20%;
+            text-align: right;
+        }
+
+        .ai-message {
+            background: #f1f3f4;
+            padding: 12px 16px;
+            border-radius: 18px 18px 18px 5px;
+            margin-right: 20%;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .question-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .quick-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .quick-btn {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-btn:hover {
+            background: #2196F3;
+            color: white;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #2196F3;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .keyword {
+            background: #2196F3;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .offline-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .offline-indicator.offline {
+            background: #ff9800;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="offline-indicator" id="networkStatus">🟢 Online</div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>📱 Offline Document AI</h1>
+            <p>Process documents without internet connection!</p>
+        </div>
 
-<header>
-  <h1>بوابة الطلاب والمبرمجين الجزائريين</h1>
-  <p>كل أدوات التعلم والبرمجة المجانية في مكان واحد</p>
-  <button onclick="toggleDark()">تغيير الوضع</button>
-</header>
+        <!-- File Upload Section -->
+        <div class="card">
+            <h2>📂 Upload Document</h2>
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                <div id="uploadContent">
+                    <h3>📄 Drop files here or click to upload</h3>
+                    <p>Supports: PDF, CSV, JSON, TXT files</p>
+                    <div class="btn" style="margin-top: 15px;">Choose File</div>
+                </div>
+                <div id="processingContent" style="display: none;">
+                    <div class="loading"></div>
+                    <p>Processing document...</p>
+                </div>
+            </div>
+            <input type="file" id="fileInput" class="file-input" accept=".pdf,.csv,.json,.txt,.md">
+            
+            <div id="documentInfo" style="display: none;">
+                <div class="document-info">
+                    <h3 id="fileName">📄 Document.txt</h3>
+                    <p id="fileDetails">Size: 0 KB | Type: Unknown</p>
+                    
+                    <div class="stats" id="documentStats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="wordCount">0</div>
+                            <div>Words</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="sentenceCount">0</div>
+                            <div>Sentences</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="charCount">0</div>
+                            <div>Characters</div>
+                        </div>
+                    </div>
+                    
+                    <div id="keywordsList" class="keywords"></div>
+                </div>
+            </div>
+        </div>
 
-<div class="controls">
-  <input type="text" id="search" placeholder="ابحث عن أي خدمة..." onkeyup="filterCards()">
-  <div class="filter-btns">
-    <button class="active" onclick="filterCategory('all')">الكل</button>
-    <button onclick="filterCategory('APIs')">APIs</button>
-    <button onclick="filterCategory('Hosting')">Hosting</button>
-    <button onclick="filterCategory('AI')">AI Tools</button>
-    <button onclick="filterCategory('Student')">Student Tools</button>
-    <button onclick="filterCategory('Developer')">Developer Tools</button>
-  </div>
-</div>
+        <!-- Chat Section -->
+        <div class="card" id="chatSection" style="display: none;">
+            <h2>💬 Ask Questions About Your Document</h2>
+            
+            <div class="quick-questions">
+                <button class="quick-btn" onclick="askQuestion('Summarize this document')">📝 Summarize</button>
+                <button class="quick-btn" onclick="askQuestion('What are the main keywords?')">🔑 Keywords</button>
+                <button class="quick-btn" onclick="askQuestion('What type of document is this?')">📊 Document Type</button>
+                <button class="quick-btn" onclick="askQuestion('How long is this document?')">📏 Length</button>
+            </div>
+            
+            <div class="input-group">
+                <input type="text" id="questionInput" class="question-input" 
+                       placeholder="Ask anything about your document..." 
+                       onkeypress="if(event.key==='Enter') askQuestion()">
+                <button class="btn" onclick="askQuestion()">Ask AI</button>
+                <button class="btn btn-secondary" onclick="clearChat()">Clear</button>
+            </div>
+            
+            <div class="chat-container" id="chatContainer">
+                <!-- Messages will appear here -->
+            </div>
+        </div>
+    </div>
 
-<div class="cards" id="cards-container">
-  <!-- Sample Card structure -->
-  <div class="card" data-category="APIs">
-    <h3>NoteAPIConnector</h3>
-    <p>API مجانية لإدارة الملاحظات.</p>
-    <a href="https://noteapiconnector.com" target="_blank">زيارة الموقع</a>
-  </div>
+    <script>
+        // Offline AI Engine
+        class OfflineDocumentAI {
+            constructor() {
+                this.documentContent = '';
+                this.documentType = '';
+                this.keywords = [];
+                this.sentences = [];
+                this.stats = {};
+            }
 
-  <div class="card" data-category="Hosting">
-    <h3>Railway</h3>
-    <p>استضافة تطبيقات مجانية حتى حد معين.</p>
-    <a href="https://railway.app" target="_blank">زيارة الموقع</a>
-  </div>
+            processDocument(content, filename) {
+                this.documentContent = content;
+                this.documentType = this.getFileType(filename);
+                
+                // Basic text analysis
+                const words = content.split(/\s+/).filter(w => w.length > 0);
+                const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 5);
+                
+                this.stats = {
+                    wordCount: words.length,
+                    sentenceCount: sentences.length,
+                    charCount: content.length,
+                    keywords: this.extractKeywords(content)
+                };
+                
+                this.sentences = sentences;
+                this.keywords = this.stats.keywords;
+                
+                return this.stats;
+            }
 
-  <div class="card" data-category="AI">
-    <h3>Supadata.ai</h3>
-    <p>أدوات ذكاء صناعي مجانية لتجارب البيانات.</p>
-    <a href="https://supadata.ai" target="_blank">زيارة الموقع</a>
-  </div>
+            extractKeywords(text) {
+                const words = text.toLowerCase()
+                    .replace(/[^\w\s]/g, ' ')
+                    .split(/\s+/)
+                    .filter(word => word.length > 3);
+                
+                // Remove common stop words
+                const stopWords = ['this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'there', 'would', 'could', 'should', 'about', 'after', 'before', 'during', 'under', 'over'];
+                const filteredWords = words.filter(word => !stopWords.includes(word));
+                
+                // Count frequency
+                const wordCount = {};
+                filteredWords.forEach(word => {
+                    wordCount[word] = (wordCount[word] || 0) + 1;
+                });
+                
+                // Return top 15 keywords
+                return Object.entries(wordCount)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 15)
+                    .map(entry => entry[0]);
+            }
 
-  <div class="card" data-category="Student">
-    <h3>حاسبة المعدلات</h3>
-    <p>حاسبة BAC والجامعة لمساعدة الطلاب على تنظيم الدرجات.</p>
-    <a href="#" target="_blank">زيارة الموقع</a>
-  </div>
+            getFileType(filename) {
+                const ext = filename.split('.').pop().toLowerCase();
+                const typeMap = {
+                    'pdf': 'PDF Document',
+                    'csv': 'CSV Data',
+                    'json': 'JSON Data',
+                    'txt': 'Text Document',
+                    'md': 'Markdown Document'
+                };
+                return typeMap[ext] || 'Unknown Document';
+            }
 
-  <div class="card" data-category="Developer">
-    <h3>VSCode.dev</h3>
-    <p>محرر أكواد مجاني على المتصفح.</p>
-    <a href="https://vscode.dev" target="_blank">زيارة الموقع</a>
-  </div>
+            answerQuestion(question) {
+                if (!this.documentContent) {
+                    return "Please upload a document first.";
+                }
 
-  <!-- يمكنك إضافة بقية المواقع هنا بنفس الطريقة -->
-</div>
+                const questionLower = question.toLowerCase();
+                
+                // Summarization
+                if (questionLower.includes('summary') || questionLower.includes('summarize')) {
+                    return this.generateSummary();
+                }
+                
+                // Keywords
+                if (questionLower.includes('keyword') || questionLower.includes('key word') || questionLower.includes('main topics')) {
+                    return `The main keywords in this document are: ${this.keywords.slice(0, 8).join(', ')}.`;
+                }
+                
+                // Document type
+                if (questionLower.includes('type') || questionLower.includes('format') || questionLower.includes('kind')) {
+                    return `This is a ${this.documentType} with ${this.stats.wordCount} words and ${this.stats.sentenceCount} sentences.`;
+                }
+                
+                // Length/size questions
+                if (questionLower.includes('long') || questionLower.includes('length') || questionLower.includes('size') || questionLower.includes('many words')) {
+                    return `This document contains ${this.stats.wordCount} words, ${this.stats.sentenceCount} sentences, and ${this.stats.charCount} characters.`;
+                }
+                
+                // Content search
+                const questionWords = questionLower.split(' ').filter(word => word.length > 3);
+                const relevantSentences = this.sentences.filter(sentence => {
+                    const sentenceLower = sentence.toLowerCase();
+                    return questionWords.some(word => sentenceLower.includes(word));
+                });
+                
+                if (relevantSentences.length > 0) {
+                    const topSentences = relevantSentences.slice(0, 2).join('. ').trim();
+                    return `Based on your document: ${topSentences}.`;
+                }
+                
+                // Fallback responses
+                const fallbacks = [
+                    `This document appears to focus on: ${this.keywords.slice(0, 4).join(', ')}.`,
+                    `I found ${this.stats.sentenceCount} sentences discussing topics related to: ${this.keywords.slice(0, 3).join(', ')}.`,
+                    `The document contains information about: ${this.keywords.slice(0, 5).join(', ')}.`
+                ];
+                
+                return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+            }
 
-<footer>
-  <p>© 2025 بوابة الطلاب والمبرمجين | مروان mr1list</p>
-</footer>
+            generateSummary() {
+                if (this.sentences.length === 0) return "No content available for summary.";
+                
+                // Score sentences based on keyword frequency
+                const scoredSentences = this.sentences.map(sentence => {
+                    const score = this.keywords.reduce((acc, keyword) => {
+                        return acc + (sentence.toLowerCase().includes(keyword) ? 1 : 0);
+                    }, 0);
+                    return { sentence: sentence.trim(), score };
+                });
+                
+                // Return top 3 sentences
+                const topSentences = scoredSentences
+                    .sort((a, b) => b.score - a.score)
+                    .slice(0, 3)
+                    .map(item => item.sentence)
+                    .join('. ');
+                
+                return `Document Summary: ${topSentences}.`;
+            }
+        }
 
-<script>
-  // ===== Dark Mode =====
-  function toggleDark(){
-    document.body.classList.toggle('dark');
-  }
+        // Initialize AI
+        const ai = new OfflineDocumentAI();
+        let chatHistory = [];
 
-  // ===== Filter =====
-  const cards = document.querySelectorAll('.card');
-  function filterCategory(cat){
-    document.querySelectorAll('.filter-btns button').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
-    cards.forEach(card => {
-      if(cat==='all' || card.dataset.category === cat){
-        card.style.display='block';
-      } else {
-        card.style.display='none';
-      }
-    });
-  }
+        // File processing functions
+        async function processFile(file) {
+            const processingContent = document.getElementById('processingContent');
+            const uploadContent = document.getElementById('uploadContent');
+            
+            processingContent.style.display = 'block';
+            uploadContent.style.display = 'none';
+            
+            try {
+                let content = '';
+                
+                if (file.type === 'application/json') {
+                    content = await readFileAsText(file);
+                    try {
+                        const jsonData = JSON.parse(content);
+                        content = `JSON Analysis:\n${JSON.stringify(jsonData, null, 2)}`;
+                    } catch (e) {
+                        content = `JSON file content:\n${content}`;
+                    }
+                } else if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+                    content = await readFileAsText(file);
+                    const lines = content.split('\n');
+                    const headers = lines[0] ? lines[0].split(',') : [];
+                    content = `CSV Analysis:\nRows: ${lines.length}\nColumns: ${headers.length}\nHeaders: ${headers.join(', ')}\n\nData:\n${content}`;
+                } else {
+                    content = await readFileAsText(file);
+                }
+                
+                // Process with AI
+                const stats = ai.processDocument(content, file.name);
+                
+                // Update UI
+                updateDocumentDisplay(file.name, file.size, stats);
+                
+                // Save to localStorage for offline access
+                localStorage.setItem('currentDocument', JSON.stringify({
+                    name: file.name,
+                    content: content,
+                    stats: stats
+                }));
+                
+            } catch (error) {
+                alert('Error processing file: ' + error.message);
+            }
+            
+            processingContent.style.display = 'none';
+            uploadContent.style.display = 'block';
+        }
 
-  // ===== Search =====
-  function filterCards(){
-    const query = document.getElementById('search').value.toLowerCase();
-    cards.forEach(card => {
-      const text = card.textContent.toLowerCase();
-      card.style.display = text.includes(query) ? 'block' : 'none';
-    });
-  }
-</script>
+        function readFileAsText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
 
-</body>
-  </html>
+        function updateDocumentDisplay(filename, fileSize, stats) {
+            document.getElementById('fileName').textContent = `📄 ${filename}`;
+            document.getElementById('fileDetails').textContent = 
+                `Size: ${Math.round(fileSize/1024)} KB | Type: ${ai.documentType}`;
+            
+            document.getElementById('wordCount').textContent = stats.wordCount.toLocaleString();
+            document.getElementById('sentenceCount').textContent = stats.sentenceCount.toLocaleString();
+            document.getElementById('charCount').textContent = stats.charCount.toLocaleString();
+            
+            // Display keywords
+            const keywordsList = document.getElementById('keywordsList');
+            keywordsList.innerHTML = stats.keywords.slice(0, 10).map(keyword => 
+                `<span class="keyword">${keyword}</span>`
+            ).join('');
+            
+            document.getElementById('documentInfo').style.display = 'block';
+            document.getElementById('chatSection').style.display = 'block';
+        }
+
+        function askQuestion(question) {
+            if (!question) {
+                question = document.getElementById('questionInput').value.trim();
+            }
+            
+            if (!question) return;
+            
+            // Add user message
+            addMessage(question, 'user');
+            
+            // Get AI response
+            const response = ai.answerQuestion(question);
+            addMessage(response, 'ai');
+            
+            // Clear input
+            document.getElementById('questionInput').value = '';
+            
+            // Save chat history
+  
