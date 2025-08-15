@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بوابة الطلاب والمبرمجين</title>
+  <style>
+    /* ===== Reset & Base ===== */
+    * {margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+    body {background:#f4f4f4;color:#333;transition:background 0.3s, color 0.3s;}
+    a {text-decoration:none;color:#007BFF;}
+    h1,h2 {margin-bottom:0.5em;}
+    /* ===== Header ===== */
+    header {padding:20px;text-align:center;background:#007BFF;color:#fff;}
+    header h1 {margin-bottom:10px;}
+    header button {padding:10px 20px;margin-top:10px;border:none;border-radius:5px;background:#fff;color:#007BFF;cursor:pointer;}
+    /* ===== Search & Filter ===== */
+    .controls {padding:20px;text-align:center;}
+    .controls input {padding:10px;width:60%;max-width:400px;border-radius:5px;border:1px solid #ccc;margin-bottom:10px;}
+    .filter-btns button {padding:8px 15px;margin:5px;border:none;border-radius:5px;background:#007BFF;color:#fff;cursor:pointer;}
+    .filter-btns button.active {background:#0056b3;}
+    /* ===== Cards ===== */
+    .cards {display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;padding:20px;}
+    .card {background:#fff;padding:15px;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+    .card h3 {margin-bottom:10px;}
+    .card p {margin-bottom:10px;}
+    .card a {display:inline-block;padding:5px 10px;background:#007BFF;color:#fff;border-radius:4px;}
+    /* ===== Footer ===== */
+    footer {padding:20px;text-align:center;background:#333;color:#fff;margin-top:20px;}
+    /* ===== Dark Mode ===== */
+    body.dark {background:#121212;color:#ddd;}
+    body.dark header {background:#1a73e8;color:#fff;}
+    body.dark .card {background:#1e1e1e;color:#ddd;box-shadow:0 2px 5px rgba(255,255,255,0.1);}
+    body.dark .filter-btns button, body.dark header button {background:#1a73e8;color:#fff;}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>بوابة الطلاب والمبرمجين الجزائريين</h1>
+  <p>كل أدوات التعلم والبرمجة المجانية في مكان واحد</p>
+  <button onclick="toggleDark()">تغيير الوضع</button>
+</header>
+
+<div class="controls">
+  <input type="text" id="search" placeholder="ابحث عن أي خدمة..." onkeyup="filterCards()">
+  <div class="filter-btns">
+    <button class="active" onclick="filterCategory('all')">الكل</button>
+    <button onclick="filterCategory('APIs')">APIs</button>
+    <button onclick="filterCategory('Hosting')">Hosting</button>
+    <button onclick="filterCategory('AI')">AI Tools</button>
+    <button onclick="filterCategory('Student')">Student Tools</button>
+    <button onclick="filterCategory('Developer')">Developer Tools</button>
+  </div>
+</div>
+
+<div class="cards" id="cards-container">
+  <!-- Sample Card structure -->
+  <div class="card" data-category="APIs">
+    <h3>NoteAPIConnector</h3>
+    <p>API مجانية لإدارة الملاحظات.</p>
+    <a href="https://noteapiconnector.com" target="_blank">زيارة الموقع</a>
+  </div>
+
+  <div class="card" data-category="Hosting">
+    <h3>Railway</h3>
+    <p>استضافة تطبيقات مجانية حتى حد معين.</p>
+    <a href="https://railway.app" target="_blank">زيارة الموقع</a>
+  </div>
+
+  <div class="card" data-category="AI">
+    <h3>Supadata.ai</h3>
+    <p>أدوات ذكاء صناعي مجانية لتجارب البيانات.</p>
+    <a href="https://supadata.ai" target="_blank">زيارة الموقع</a>
+  </div>
+
+  <div class="card" data-category="Student">
+    <h3>حاسبة المعدلات</h3>
+    <p>حاسبة BAC والجامعة لمساعدة الطلاب على تنظيم الدرجات.</p>
+    <a href="#" target="_blank">زيارة الموقع</a>
+  </div>
+
+  <div class="card" data-category="Developer">
+    <h3>VSCode.dev</h3>
+    <p>محرر أكواد مجاني على المتصفح.</p>
+    <a href="https://vscode.dev" target="_blank">زيارة الموقع</a>
+  </div>
+
+  <!-- يمكنك إضافة بقية المواقع هنا بنفس الطريقة -->
+</div>
+
+<footer>
+  <p>© 2025 بوابة الطلاب والمبرمجين | مروان mr1list</p>
+</footer>
+
+<script>
+  // ===== Dark Mode =====
+  function toggleDark(){
+    document.body.classList.toggle('dark');
+  }
+
+  // ===== Filter =====
+  const cards = document.querySelectorAll('.card');
+  function filterCategory(cat){
+    document.querySelectorAll('.filter-btns button').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    cards.forEach(card => {
+      if(cat==='all' || card.dataset.category === cat){
+        card.style.display='block';
+      } else {
+        card.style.display='none';
+      }
+    });
+  }
+
+  // ===== Search =====
+  function filterCards(){
+    const query = document.getElementById('search').value.toLowerCase();
+    cards.forEach(card => {
+      const text = card.textContent.toLowerCase();
+      card.style.display = text.includes(query) ? 'block' : 'none';
+    });
+  }
+</script>
+
+</body>
+  </html>
