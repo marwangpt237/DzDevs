@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📱 Offline Document AI</title>
+    <title>ðŸ“± Offline Document AI</title>
     <link rel="manifest" href="#" id="manifest">
     <meta name="theme-color" content="#2196F3">
     <meta name="mobile-web-app-capable" content="yes">
@@ -256,20 +256,20 @@
     </style>
 </head>
 <body>
-    <div class="offline-indicator" id="networkStatus">🟢 Online</div>
+    <div class="offline-indicator" id="networkStatus">ðŸŸ¢ Online</div>
     
     <div class="container">
         <div class="header">
-            <h1>📱 Offline Document AI</h1>
+            <h1>ðŸ“± Offline Document AI</h1>
             <p>Process documents without internet connection!</p>
         </div>
 
         <!-- File Upload Section -->
         <div class="card">
-            <h2>📂 Upload Document</h2>
+            <h2>ðŸ“‚ Upload Document</h2>
             <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
                 <div id="uploadContent">
-                    <h3>📄 Drop files here or click to upload</h3>
+                    <h3>ðŸ“„ Drop files here or click to upload</h3>
                     <p>Supports: PDF, CSV, JSON, TXT files</p>
                     <div class="btn" style="margin-top: 15px;">Choose File</div>
                 </div>
@@ -282,7 +282,7 @@
             
             <div id="documentInfo" style="display: none;">
                 <div class="document-info">
-                    <h3 id="fileName">📄 Document.txt</h3>
+                    <h3 id="fileName">ðŸ“„ Document.txt</h3>
                     <p id="fileDetails">Size: 0 KB | Type: Unknown</p>
                     
                     <div class="stats" id="documentStats">
@@ -307,13 +307,13 @@
 
         <!-- Chat Section -->
         <div class="card" id="chatSection" style="display: none;">
-            <h2>💬 Ask Questions About Your Document</h2>
+            <h2>ðŸ’¬ Ask Questions About Your Document</h2>
             
             <div class="quick-questions">
-                <button class="quick-btn" onclick="askQuestion('Summarize this document')">📝 Summarize</button>
-                <button class="quick-btn" onclick="askQuestion('What are the main keywords?')">🔑 Keywords</button>
-                <button class="quick-btn" onclick="askQuestion('What type of document is this?')">📊 Document Type</button>
-                <button class="quick-btn" onclick="askQuestion('How long is this document?')">📏 Length</button>
+                <button class="quick-btn" onclick="askQuestion('Summarize this document')">ðŸ“ Summarize</button>
+                <button class="quick-btn" onclick="askQuestion('What are the main keywords?')">ðŸ”‘ Keywords</button>
+                <button class="quick-btn" onclick="askQuestion('What type of document is this?')">ðŸ“Š Document Type</button>
+                <button class="quick-btn" onclick="askQuestion('How long is this document?')">ðŸ“ Length</button>
             </div>
             
             <div class="input-group">
@@ -330,6 +330,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/compromise@14.14.4/builds/compromise.min.js"></script>
     <script>
         // Offline AI Engine
         class OfflineDocumentAI {
@@ -345,9 +346,10 @@
                 this.documentContent = content;
                 this.documentType = this.getFileType(filename);
                 
-                // Basic text analysis
-                const words = content.split(/\s+/).filter(w => w.length > 0);
-                const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 5);
+                // Basic text analysis with Compromise
+                const doc = nlp(content);
+                const words = doc.words().out("array");
+                const sentences = doc.sentences().out("array").filter(s => s.trim().length > 5);
                 
                 this.stats = {
                     wordCount: words.length,
@@ -363,26 +365,9 @@
             }
 
             extractKeywords(text) {
-                const words = text.toLowerCase()
-                    .replace(/[^\w\s]/g, ' ')
-                    .split(/\s+/)
-                    .filter(word => word.length > 3);
-                
-                // Remove common stop words
-                const stopWords = ['this', 'that', 'with', 'have', 'will', 'from', 'they', 'been', 'were', 'said', 'each', 'which', 'their', 'what', 'there', 'would', 'could', 'should', 'about', 'after', 'before', 'during', 'under', 'over'];
-                const filteredWords = words.filter(word => !stopWords.includes(word));
-                
-                // Count frequency
-                const wordCount = {};
-                filteredWords.forEach(word => {
-                    wordCount[word] = (wordCount[word] || 0) + 1;
-                });
-                
-                // Return top 15 keywords
-                return Object.entries(wordCount)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 15)
-                    .map(entry => entry[0]);
+                const doc = nlp(text);
+                const keywords = doc.nouns().unique().out('array').filter(w => w.length > 2);
+                return keywords.slice(0, 15);
             }
 
             getFileType(filename) {
@@ -403,68 +388,53 @@
                 }
 
                 const questionLower = question.toLowerCase();
+                const doc = nlp(this.documentContent);
                 
                 // Summarization
-                if (questionLower.includes('summary') || questionLower.includes('summarize')) {
-                    return this.generateSummary();
+                if (questionLower.includes("summary") || questionLower.includes("summarize")) {
+                    const summarySentences = doc.sentences().filter(s => s.has("#Noun")).slice(0, 3).out("array");
+                    return `Document Summary: ${summarySentences.join(" ")}.`;
                 }
                 
                 // Keywords
-                if (questionLower.includes('keyword') || questionLower.includes('key word') || questionLower.includes('main topics')) {
-                    return `The main keywords in this document are: ${this.keywords.slice(0, 8).join(', ')}.`;
+                if (questionLower.includes("keyword") || questionLower.includes("key word") || questionLower.includes("main topics")) {
+                    return `The main keywords in this document are: ${this.keywords.slice(0, 8).join(", ")}.`;
                 }
                 
                 // Document type
-                if (questionLower.includes('type') || questionLower.includes('format') || questionLower.includes('kind')) {
+                if (questionLower.includes("type") || questionLower.includes("format") || questionLower.includes("kind")) {
                     return `This is a ${this.documentType} with ${this.stats.wordCount} words and ${this.stats.sentenceCount} sentences.`;
                 }
                 
                 // Length/size questions
-                if (questionLower.includes('long') || questionLower.includes('length') || questionLower.includes('size') || questionLower.includes('many words')) {
+                if (questionLower.includes("long") || questionLower.includes("length") || questionLower.includes("size") || questionLower.includes("many words")) {
                     return `This document contains ${this.stats.wordCount} words, ${this.stats.sentenceCount} sentences, and ${this.stats.charCount} characters.`;
                 }
                 
-                // Content search
-                const questionWords = questionLower.split(' ').filter(word => word.length > 3);
-                const relevantSentences = this.sentences.filter(sentence => {
-                    const sentenceLower = sentence.toLowerCase();
-                    return questionWords.some(word => sentenceLower.includes(word));
-                });
+                // Content search using Compromise
+                const questionDoc = nlp(question);
+                const questionNouns = questionDoc.nouns().out("array");
+                const relevantSentences = doc.sentences().filter(s => {
+                    return questionNouns.some(noun => s.text().toLowerCase().includes(noun.toLowerCase()));
+                }).slice(0, 2).out("array");
                 
                 if (relevantSentences.length > 0) {
-                    const topSentences = relevantSentences.slice(0, 2).join('. ').trim();
-                    return `Based on your document: ${topSentences}.`;
+                    return `Based on your document: ${relevantSentences.join(" ")}.`;
                 }
                 
                 // Fallback responses
                 const fallbacks = [
-                    `This document appears to focus on: ${this.keywords.slice(0, 4).join(', ')}.`,
-                    `I found ${this.stats.sentenceCount} sentences discussing topics related to: ${this.keywords.slice(0, 3).join(', ')}.`,
-                    `The document contains information about: ${this.keywords.slice(0, 5).join(', ')}.`
+                    `This document appears to focus on: ${this.keywords.slice(0, 4).join(", ")}.`,
+                    `I found ${this.stats.sentenceCount} sentences discussing topics related to: ${this.keywords.slice(0, 3).join(", ")}.`,
+                    `The document contains information about: ${this.keywords.slice(0, 5).join(", ")}.`
                 ];
                 
                 return fallbacks[Math.floor(Math.random() * fallbacks.length)];
             }
 
             generateSummary() {
-                if (this.sentences.length === 0) return "No content available for summary.";
-                
-                // Score sentences based on keyword frequency
-                const scoredSentences = this.sentences.map(sentence => {
-                    const score = this.keywords.reduce((acc, keyword) => {
-                        return acc + (sentence.toLowerCase().includes(keyword) ? 1 : 0);
-                    }, 0);
-                    return { sentence: sentence.trim(), score };
-                });
-                
-                // Return top 3 sentences
-                const topSentences = scoredSentences
-                    .sort((a, b) => b.score - a.score)
-                    .slice(0, 3)
-                    .map(item => item.sentence)
-                    .join('. ');
-                
-                return `Document Summary: ${topSentences}.`;
+                // This method is now redundant as summarization is handled directly in answerQuestion
+                return "Summarization is now handled by the main question answering logic.";
             }
         }
 
@@ -531,7 +501,7 @@
         }
 
         function updateDocumentDisplay(filename, fileSize, stats) {
-            document.getElementById('fileName').textContent = `📄 ${filename}`;
+            document.getElementById('fileName').textContent = `ðŸ“„ ${filename}`;
             document.getElementById('fileDetails').textContent = 
                 `Size: ${Math.round(fileSize/1024)} KB | Type: ${ai.documentType}`;
             
